@@ -1,0 +1,39 @@
+#!/bin/sh
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
+
+BUILDPACK_HOME="$(dirname $0)/.."
+
+echo "-----> Installing..."
+echo "       Reading zip password from environment variable"
+echo "       Extracting assets.zip"
+
+echo "-----> DEBUG: reading contents of ENV_DIR"
+echo "       ENV_DIR: ${ENV_DIR}"
+echo "       ls: \${ENV_DIR}"
+echo "$(ls ${ENV_DIR})"
+
+gpg --decrypt --batch \
+	--passphrase-file ${ENV_DIR}/BUILDPACK_ASSETS_PASSPHRASE \
+	${BUILDPACK_HOME}/assets.tar.gz.gpg | tar -xzf -
+
+if [ -d 'assets' ]; then
+	echo "       ./assets exists!"
+else
+	echo "       warning: ./assets did not exist"
+	exit 1
+fi
+
+echo "       Running install script"
+
+${BUILDPACK_HOME}/assets/install.sh ${BUILD_DIR}
+
+if [ $? -eq 0 ]; then
+	echo "       Complete!"
+	exit 0
+else
+	echo "       Failed." # TODO: error output?
+	exit 1
+fi

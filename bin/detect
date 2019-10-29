@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# verify presence of executables which may be needed by custom buildpack
+# payloads; fail if any of the required commands is unavailable
+command -v dpkg >/dev/null 2>&1 || { echo >&2 "no"; exit 1; }
+command -v gpg >/dev/null 2>&1 || { echo >&2 "no"; exit 1; }
+command -v tar >/dev/null 2>&1 || { echo >&2 "no"; exit 1; }
+
+echo "CustomBuildpack"
+exit 0
